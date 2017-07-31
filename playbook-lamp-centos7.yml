@@ -1,0 +1,34 @@
+- hosts: 10.0.0.20
+#change 10.0.0.20 to youre hosts
+  tasks:
+    - name: "Install httpd"
+      yum:
+        name: httpd
+        state: latest
+    - systemd:
+        name: httpd.service
+        enabled: yes
+        masked: no
+    - name: "Install MariaDB-server"
+      yum:
+        name: mariadb-server
+        state: latest
+    - systemd:
+        name: mariadb
+        state: started
+    - systemd:
+        name: mariadb
+        enabled: yes
+        masked: no
+    - name: "Install PHP"
+      yum:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - php
+        - php-mysql
+    - template: src=templates/info.php.j2 dest=/var/www/html/info.php
+    - systemd:
+        state: restarted
+        daemon_reload: yes
+        name: httpd
